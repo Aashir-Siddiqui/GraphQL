@@ -1,5 +1,5 @@
 import React from "react";
-import { useQuery, useMutation } from "@apollo/client";
+import { useQuery, useMutation } from "@apollo/client/react";
 import { GET_STUDENTS } from "../graphql/queries";
 import { DELETE_STUDENT } from "../graphql/mutations";
 import StudentCard from "../components/StudentCard";

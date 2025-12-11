@@ -11,3 +11,15 @@ export const GET_TEACHERS = gql`
     }
   }
 `;
+
+export const GET_TEACHER = gql`
+  query GetTeacher($id: ID!) {
+    getTeacher(id: $id) {
+      id
+      name
+      email
+      subject
+      phone
+    }
+  }
+`;

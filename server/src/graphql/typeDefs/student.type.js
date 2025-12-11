@@ -11,6 +11,7 @@ export const studentType = gql`
 
   type Query {
     getStudents: [Student]
+    getStudent(id: ID!): Student
   }
 
   type Mutation {
@@ -20,5 +21,15 @@ export const studentType = gql`
       rollNo: String!
       classId: ID!
     ): Student
+
+    updatedStudent(
+      id: ID!
+      name: String
+      email: String
+      rollNo: String
+      classId: ID
+    ): Student
+
+    deleteStudent(id: ID!): String
   }
 `;

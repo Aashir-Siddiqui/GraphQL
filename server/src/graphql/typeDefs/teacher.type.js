@@ -5,7 +5,7 @@ export const teacherType = gql`
     id: ID!
     name: String!
     email: String!
-    subject: String!
+    subject: [String!]!
     phone: String!
   }
 
@@ -18,10 +18,17 @@ export const teacherType = gql`
     addTeacher(
       name: String!
       email: String!
-      subject: String!
+      subject: [String!]!
       phone: String!
     ): Teacher
 
+    updatedTeacher(
+      id: ID!
+      name: String
+      email: String
+      subject: [String!]
+      phone: String
+    ): Teacher
     deleteTeacher(id: ID!): String
   }
 `;

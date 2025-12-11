@@ -4,14 +4,32 @@ export const classType = gql`
   type Class {
     id: ID!
     name: String!
+    classStartTime: String!
+    classEndTime: String!
     teacher: Teacher
   }
 
-  extend type Query {
+  type Query {
     getClasses: [Class]
+    getClass(id: ID!): Class
   }
 
-  extend type Mutation {
-    addClass(name: String!, teacherId: ID!): Class
+  type Mutation {
+    addClass(
+      name: String!
+      classStartTime: String!
+      classEndTime: String!
+      teacherId: ID!
+    ): Class
+
+    updatedClass(
+      id: ID!
+      name: String
+      classStartTime: String
+      classEndTime: String
+      teacherId: ID
+    ): Class
+
+    deleteClass(id: ID!): String
   }
 `;

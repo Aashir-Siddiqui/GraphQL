@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client/react";
 import { ADD_STUDENT } from "../graphql/mutations";
 import { GET_CLASSES } from "../graphql/queries";
 import { useNavigate } from "react-router-dom";
@@ -14,7 +14,7 @@ const AddStudent = () => {
     data: classesData,
   } = useQuery(GET_CLASSES);
   const [addStudent, { loading, error }] = useMutation(ADD_STUDENT, {
-    onCompleted: () => navigate("/students"), // Redirect after successful addition
+    onCompleted: () => navigate("/students"),
     onError: (err) => console.error("Error adding student:", err.message),
   });
 
@@ -37,7 +37,7 @@ const AddStudent = () => {
     await addStudent({
       variables: {
         name: formData.name,
-        age: parseInt(formData.age), // Convert age to Int
+        age: parseInt(formData.age),
         gender: formData.gender,
         email: formData.email,
         phone: formData.phone,
@@ -168,7 +168,7 @@ const AddStudent = () => {
               Phone
             </label>
             <input
-              type="tel" // Use tel for phone numbers
+              type="tel"
               name="phone"
               id="phone"
               value={formData.phone}

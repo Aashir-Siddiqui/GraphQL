@@ -5,9 +5,26 @@ export const GET_CLASSES = gql`
     getClasses {
       id
       name
+      classStartTime
+      classEndTime
       teacher {
         id
-        name # Fetching teacher name
+        name
+      }
+    }
+  }
+`;
+
+export const GET_CLASS = gql`
+  query GetClass($id: ID!) {
+    getClass(id: $id) {
+      id
+      name
+      classStartTime
+      classEndTime
+      teacher {
+        id
+        name
       }
     }
   }

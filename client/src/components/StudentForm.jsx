@@ -1,10 +1,18 @@
-import { useMutation, useQuery } from "@apollo/client";
-import { ADD_STUDENT } from "../graphql/mutations/student.mutation";
-import { GET_STUDENTS } from "../graphql/queries/student.query";
-import { GET_CLASSES } from "../graphql/queries/class.query"; // Import Class Query
-import { useState } from "react";
+import { useMutation, useQuery } from "@apollo/client/react";
+import {
+  ADD_STUDENT,
+  UPDATE_STUDENT,
+} from "../graphql/mutations/student.mutation";
+import { GET_STUDENTS, GET_STUDENT } from "../graphql/queries/student.query";
+import { GET_CLASSES } from "../graphql/queries/class.query";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom"; 
 
 const StudentForm = () => {
+  const navigate = useNavigate();
+  const { id: studentId } = useParams();
+  const isEditMode = !!studentId;
+
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -12,41 +20,84 @@ const StudentForm = () => {
     classId: "",
   });
 
+  // Classes data fetch karein
   const { data: classesData, loading: classesLoading } = useQuery(GET_CLASSES);
+  const classes = classesData?.getClasses || [];
 
-  const [addStudent, { loading: mutationLoading, error: mutationError }] =
-    useMutation(ADD_STUDENT, {
-      refetchQueries: [GET_STUDENTS], // Refresh student list
-    });
+  // ✅ EDIT MODE: Existing Student data fetch karein
+  const { data: studentData, loading: studentLoading } = useQuery(GET_STUDENT, {
+    variables: { id: studentId },
+    skip: !isEditMode, // Sirf Edit Mode mein chalao
+  });
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    if (!form.classId) return alert("Please select a Class.");
-    try {
-      await addStudent({ variables: form });
-      setForm({ name: "", email: "", rollNo: "", classId: "" });
-    } catch (error) {
-      console.error("Error adding student:", error);
-      // Error will be shown via mutationError
+  // ✅ EFFECT: Jab student data fetch ho jaaye, toh form ko pre-fill karein
+  useEffect(() => {
+    if (isEditMode && studentData?.getStudent) {
+      const student = studentData.getStudent;
+      setForm({
+        name: student.name,
+        email: student.email,
+        rollNo: student.rollNo,
+        classId: student.class?.id || "", // Existing class ID set karein
+      });
     }
-  };
+  }, [isEditMode, studentData]);
+
+  // Mutations (Dono ke liye hooks set karein)
+  const [addStudent, { loading: addLoading }] = useMutation(ADD_STUDENT, {
+    refetchQueries: [{ query: GET_STUDENTS }],
+  });
+
+  const [updateStudent, { loading: updateLoading }] = useMutation(
+    UPDATE_STUDENT,
+    {
+      refetchQueries: [{ query: GET_STUDENTS }],
+    }
+  );
+
+  const mutationLoading = addLoading || updateLoading;
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const classes = classesData?.getClasses || [];
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (!form.classId) return alert("Please select a Class.");
+
+    try {
+      if (isEditMode) {
+        // ✅ UPDATE LOGIC
+        await updateStudent({
+          variables: { id: studentId, ...form },
+        });
+        alert("Student Updated Successfully!");
+      } else {
+        // ✅ ADD LOGIC
+        await addStudent({ variables: form });
+        alert("Student Added Successfully!");
+      }
+      navigate("/students"); // Success par list page par wapas le jayen
+    } catch (error) {
+      console.error("Mutation Error:", error);
+      alert(`Error: ${error.message}`);
+    }
+  };
+
+  if (isEditMode && studentLoading)
+    return (
+      <div className="text-center mt-10 text-lg">Loading Student Data...</div>
+    );
+
+  const formTitle = isEditMode ? "Update Student" : "Add New Student";
+  const submitButtonText = isEditMode ? "Save Changes" : "Add Student";
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg mt-8">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
-        Add New Student
+    <div className="max-w-xl mx-auto p-6 bg-white rounded-xl shadow-2xl mt-10">
+      <h2 className="text-3xl font-extrabold text-indigo-700 mb-6 border-b pb-4">
+        {formTitle}
       </h2>
-      {mutationError && (
-        <p className="text-red-500 mb-4">Error: {mutationError.message}</p>
-      )}
-
-      <form onSubmit={submitHandler} className="space-y-4">
+      <form onSubmit={submitHandler} className="space-y-6">
         <div>
           <label
             htmlFor="name"
@@ -132,9 +183,9 @@ const StudentForm = () => {
         <button
           type="submit"
           disabled={mutationLoading}
-          className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="w-full inline-flex justify-center py-3 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-400 transition-colors"
         >
-          {mutationLoading ? "Adding..." : "Add Student"}
+          {mutationLoading ? "Processing..." : submitButtonText}
         </button>
       </form>
     </div>

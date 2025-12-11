@@ -7,6 +7,18 @@ const classSchema = new mongoose.Schema(
       required: true,
     },
 
+    // ✅ NEW FIELD: Class Start Time
+    classStartTime: {
+      type: String,
+      required: true,
+    },
+
+    // ✅ NEW FIELD: Class End Time
+    classEndTime: {
+      type: String,
+      required: true,
+    },
+
     teacher: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teacher",

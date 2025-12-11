@@ -11,10 +11,17 @@ import { classType } from "./typeDefs/class.type.js";
 import { classResolver } from "./resolvers/class.resolver.js";
 
 // ✅ Attendance
-import { attendanceType } from "./typeDefs/attendance.type.js";
+// Note: Changed import name to match the array export
+import { attendanceTypes } from "./typeDefs/attendance.type.js";
 import { attendanceResolver } from "./resolvers/attendance.resolver.js";
 
-export const typeDefs = [studentType, teacherType, classType, attendanceType];
+// ✅ UPDATED: attendanceTypes array ko spread operator (...) se include kiya gaya hai
+export const typeDefs = [
+  studentType,
+  teacherType,
+  classType,
+  ...attendanceTypes, // Spreading the Enum and Type
+];
 
 export const resolvers = [
   studentResolver,

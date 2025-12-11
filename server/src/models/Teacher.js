@@ -13,8 +13,9 @@ const teacherSchema = new mongoose.Schema(
       unique: true,
     },
 
+    // ✅ CHANGE: 'subject' is now an array of strings
     subject: {
-      type: String,
+      type: [String], // Array of Strings
       required: true,
     },
 
